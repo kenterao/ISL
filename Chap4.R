@@ -181,7 +181,144 @@ dnorm(4,10,6) * prD / ( dnorm(4,10,6) * prD + dnorm(4,0,6) * (1-prD))
 0.37 / (1 + 0.37)
 (1 - 0.16) / 0.16
 
-
+# Applied
+# 10 Weekly data set
+dim(Weekly)
+summary(Weekly)
+attach(Weekly)
+# 10a
+pairs(Weekly[,2:8])
+hist(Weekly$Today, breaks=25)
+# 10b
+glm.fit=glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume,data=Weekly,family=binomial)
+summary(glm.fit)
+# only the intercept is statistically significant
+# 10c
+glm.probs=predict(glm.fit,type="response")
+glm.pred=rep("Down",1089)
+glm.pred[glm.probs>.5]="Up"
+table(glm.pred,Weekly$Direction)
+# Prediction are biased up
+sum(glm.pred=="Up")/length(glm.pred)
+# 10d
+train = (Year<=2008)
+Weekly.2009 = Weekly[!train,]
+dim(Weekly.2009)
+Direction.2009 = Direction[!train]
+glm.fit=glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume,data=Weekly,family=binomial,subset=train)
+glm.probs=predict(glm.fit,Weekly.2009,type="response")
+glm.pred=rep("Down",104)
+glm.pred[glm.probs>.5]="Up"
+table(glm.pred,Direction.2009)
+48/102
+# estimates biased down
+# 10e
+lda.fit=lda(Direction~Lag1+Lag2+Lag3+Lag4+Lag5,data=Weekly,subset=train)
+lda.pred=predict(lda.fit, Weekly.2009)
+lda.class=lda.pred$class
+table(lda.class,Direction.2009)
+57/102
+# 10f
+qda.fit=qda(Direction~Lag1+Lag2+Lag3+Lag4+Lag5,data=Weekly,subset=train)
+qda.pred=predict(qda.fit, Weekly.2009)
+qda.class=qda.pred$class
+table(qda.class,Direction.2009)
+48/102
+# 10g
+train.X=cbind(Lag1,Lag2,Lag3,Lag4,Lag5)[train,]
+test.X=cbind(Lag1,Lag2,Lag3,Lag4,Lag5)[!train,]
+train.Direction=Direction[train]
+set.seed(1)
+knn.pred=knn(train.X,test.X,train.Direction,k=1)
+table(knn.pred,Direction.2009)
+54/102
+# 10h
+# LDA looks the best
+# 10i
+# 11 Auto data set: mpg
+summary(Auto)
+dim(Auto)
+# 11a
+Auto$mpg01 = Auto$mpg > median(Auto$mpg)
+attach(Auto)
+summary(Auto)
+# 11b
+plot(Auto$mpg01, Auto$cylinders) # Yes
+plot(Auto$mpg01, Auto$displacement) # Yes
+plot(Auto$mpg01, Auto$horsepower) # Slightly
+plot(Auto$mpg01, Auto$weight) # Slightly
+plot(Auto$mpg01, Auto$acceleration) # No
+table(Auto$mpg01, Auto$year) # Yes
+table(Auto$mpg01, Auto$origin) # Yes
+# 11c
+N = dim(Auto)[1]
+train = (rbinom(N, 1, 0.8)==1)
+Auto.test = Auto[!train,]
+dim(Auto.test)
+mpg01.test = Auto$mpg01[!train]
+# 11d
+lda.fit=lda(mpg01~cylinders+displacement+horsepower+weight+year+origin,data=Auto,subset=train)
+lda.pred=predict(lda.fit, Auto.test)
+lda.class=lda.pred$class
+table(lda.class,mpg01.test)
+sum(lda.class==mpg01.test)
+# 11e
+qda.fit=qda(mpg01~cylinders+displacement+horsepower+weight+year+origin,data=Auto,subset=train)
+qda.pred=predict(qda.fit, Auto.test)
+qda.class=qda.pred$class
+table(qda.class,mpg01.test)
+sum(qda.class==mpg01.test)
+# 11f
+glm.fit=glm(mpg01~cylinders+displacement+horsepower+weight+year+origin,data=Weekly,family=binomial)
+glm.pred = (predict(glm.fit, Auto.test, type="response")>0.50)
+table(glm.pred, mpg01.test)
+sum(glm.pred == mpg01.test)
+# 11g
+train.X=cbind(cylinders,displacement,horsepower,weight,year,origin)[train,]
+test.X=cbind(cylinders,displacement,horsepower,weight,year,origin)[!train,]
+train.mpg01=Auto$mpg01[train]
+set.seed(1)
+knn.pred=knn(train.X,test.X,train.mpg01,k=1)
+table(knn.pred,mpg01.test)
+sum(knn.pred == mpg01.test)
+#
+knn.pred=knn(train.X,test.X,train.mpg01,k=3)
+table(knn.pred,mpg01.test)
+sum(knn.pred == mpg01.test)
+#
+knn.pred=knn(train.X,test.X,train.mpg01,k=5)
+table(knn.pred,mpg01.test)
+sum(knn.pred == mpg01.test)
+# 12: Writing function
+# 12a
+Power <- function() {
+	print(2^3)
+}
+Power()
+# 12b
+Power2 <- function(x,a) {
+	print(x^a)
+}
+Power2(3,8)
+# 12c
+Power2(10,3)
+Power2(8,17)
+Power2(131,3)
+# 12d
+Power3 <- function(x,a) {
+	result = x^a
+	return(result)
+}
+# 12e
+x = 1:10
+y = unlist(lapply(x, function(a){Power3(a,2)}))
+plot(x,y)
+# 12f
+PlotPower <- function(xx, a) {
+	y = unlist(lapply(xx, function(b){Power3(b,a)}))
+	plot(xx,y)
+}
+PlotPower(1:10,3)
 
 
 
