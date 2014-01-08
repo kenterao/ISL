@@ -1,7 +1,7 @@
 # Chapter 4 Lab: Logistic Regression, LDA, QDA, and KNN
 
 setwd("C:/Users/Ken/Documents/ISL")
-
+# test
 # The Stock Market Data
 
 library(ISLR)
