@@ -1,5 +1,10 @@
 # Chaper 5 Lab: Cross-Validation and the Bootstrap
 
+# for home Windows machine
+#setwd("C:/Users/Ken/Documents/ISL")
+# for Jump Windows machine
+setwd("C:/Users/kterao/Documents/ISL")
+
 # The Validation Set Approach
 
 library(ISLR)
@@ -75,4 +80,163 @@ boot.fn=function(data,index)
 set.seed(1)
 boot(Auto,boot.fn,1000)
 summary(lm(mpg~horsepower+I(horsepower^2),data=Auto))$coef
+
+
+# Exercises: Conceptual
+
+# 1: Minimum Variance
+# See notes
+
+# 2: Bootstrap samples
+# 2a
+# 1 - 1/n
+# 2b
+# 1 - 1/n
+# 2c
+(1 - 1/n)^n
+pr = function(n) { 1 - (1 - 1/n)^n }
+# 2d
+pr(5)
+# 2e
+pr(100)
+# 2f
+pr(10000)
+# 2g
+plot(1:10000,pr(1:10000))
+1 - exp(-1) # converges to this
+# 2h
+store=rep(NA, 10000)
+for(i in 1:10000) {
+	store[i] = sum(sample(1:100, rep=TRUE)==4)>0
+}
+mean(store)
+
+# 3: K-fold cross-validation
+# 3b: VS Validation Set
+# advantage: maintain a whole data set, not waste any data
+# disadvantage: computation time
+# VS LOOCV
+# advantage: computation time, lower variance
+# disadvantage: smaller sample size
+
+# 4: standard deviation of y-hat
+# Estimate confidence intervals on beta_i into the model.
+# Resample, fit model, estimate beta_i_hat and get y_hat
+# Repeat with different resample, and collect output
+# and calculate distribution based on these y_hats for different resamples
+# Essentially bootstrapping
+
+
+# Exercises: Applied
+# 5: Logistic regression
+# 5a
+
+# 5b
+
+# 5c
+
+# 5d
+
+
+# 6: Logistic Regression
+
+# 6a
+
+# 6b
+
+# 6c
+
+# 6d
+
+
+# 7: GLM and LOOCV
+
+# 7a
+
+# 7b
+
+# 7c
+
+# 7d
+
+# 7e
+
+
+# 8: Simulated CV
+
+# 8a
+
+# 8b
+
+# 8c
+
+# 8d
+
+# 8e
+
+# 8f
+
+
+# 9: Boston data
+
+# 9a
+
+# 9b
+
+# 9c
+
+# 9d
+
+# 9e
+
+# 9f
+
+# 9g
+
+# 9h
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
