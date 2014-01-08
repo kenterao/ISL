@@ -1,7 +1,9 @@
 # Chapter 4 Lab: Logistic Regression, LDA, QDA, and KNN
 
-setwd("C:/Users/Ken/Documents/ISL")
-# test
+# for home Windows machine
+#setwd("C:/Users/Ken/Documents/ISL")
+# for Jump Windows machine
+setwd("C:/Users/kterao/Documents/ISL")
 # The Stock Market Data
 
 library(ISLR)
@@ -92,6 +94,7 @@ mean(knn.pred==Direction.2005)
 
 dim(Caravan)
 attach(Caravan)
+summary(Caravan)
 summary(Purchase)
 348/5822
 standardized.X=scale(Caravan[,-86])
@@ -125,3 +128,80 @@ glm.pred=rep("No",1000)
 glm.pred[glm.probs>.25]="Yes"
 table(glm.pred,test.Y)
 11/(22+11)
+
+# Exercises
+# 1
+# Proof is trivial
+# 2
+# See notebook for proof
+# 3
+# See notebook for solution
+# 4 Large p in KNN:
+# Curse of Dimensionality for Non-parametric methods
+# 4a
+# 10%
+# 4b
+# 1% = (0.10)^2
+# 4c
+# (0.10)^p
+# 4d
+# 4e
+(0.10)^(1/2)
+(0.10)^(1/3)
+(0.10)^(1/4)
+# Cube edges have to get pretty large to encompass 10% of the data.
+# 5: LDA vs QDA
+# 5a
+# Since QDA has more free parameters it will fit better in the training set.
+# LDA should perform better on the test set, since it more closely models the linear reality
+# 5b
+# Since QDA has more free parameters it will fit better in the training set.
+# QDA should perform better on the test set, since it more closely models the linear reality
+# 5c
+# test prediction for QDA should increase for more complex Bayes decision boundaries
+# since QDA can capture more of the functional complexities more accurately with more data
+# LDA probably will not be affected as much with increase in sample size
+# 5d
+# True due to more free parameters
+# 6
+score = -6 + 0.05*40 + 1*3.5
+exp(score) / (1 + exp(score))
+score = 0
+(score + 6 - 1*3.5) / 0.05
+# 7
+# Pr(D|X=4) = Pr(X=4|D)*Pr(D) / ( Pr(X=4|D)*Pr(D) + Pr(X=4|Dc)*Pr(Dc) )
+prD = 0.80
+dnorm(4,10,6) * prD / ( dnorm(4,10,6) * prD + dnorm(4,0,6) * (1-prD))
+0.752
+# 8
+# Uncertain.  Since KNN is fitting only on a training set, it is prone to overfitting, 
+# especially when using a nonparametric method.  No conclusion can be drawn about 
+# test error estimates.
+# 9
+0.37 / (1 + 0.37)
+(1 - 0.16) / 0.16
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
