@@ -129,25 +129,60 @@ mean(store)
 
 # Exercises: Applied
 # 5: Logistic regression
+set.seed(1)
+summary(Default)
+dim(Default)
 # 5a
-
-# 5b
-
-# 5c
-
+glm.fit=glm(default~income+balance,data=Default,family=binomial)
+summary(glm.fit)
+plot(Default$default, Default$income)
+plot(Default$default, Default$balance)
+table(Default$default, Default$student)
+# 5b, c
+store = rep(0,10)
+for( ii in 1:length(store) ) {
+train = sample(10000,8000)
+glm.fit=glm(default~income+balance, data=Default, family=binomial, subset=train)
+summary(glm.fit)
+glm.probs=predict(glm.fit, Default[-train,])
+glm.pred=rep("No",2000)
+glm.pred[glm.probs>.5]="Yes"
+res = table(glm.pred, Default$default[-train])
+store[ii] = (res[1,2] + res[2,1]) / 2000
+}
+store
+mean(store)
 # 5d
-
+store = rep(0,10)
+for( ii in 1:length(store) ) {
+train = sample(10000,8000)
+glm.fit=glm(default~income+balance+student, data=Default, family=binomial, subset=train)
+summary(glm.fit)
+glm.probs=predict(glm.fit, Default[-train,])
+glm.pred=rep("No",2000)
+glm.pred[glm.probs>.5]="Yes"
+res = table(glm.pred, Default$default[-train])
+store[ii] = (res[1,2] + res[2,1]) / 2000
+}
+store
+mean(store)
+# Marginal difference
 
 # 6: Logistic Regression
-
 # 6a
-
+glm.fit=glm(default~income+balance, data=Default, family=binomial)
+summary(glm.fit)
 # 6b
-
+boot.fn = function(data, index) {
+return(coef(glm(default~income+balance, data=data, subset=index, family=binomial)))
+}
+boot.fn(Default, sample(10000,10000,replace=TRUE))
 # 6c
-
+boot(Default, boot.fn, 1000)
 # 6d
-
+# Standard errors are approximately the same, 
+# meaning the model assumptions of homeskedasticity, independence, etc.
+# are relatively sound
 
 # 7: GLM and LOOCV
 
