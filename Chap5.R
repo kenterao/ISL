@@ -185,52 +185,95 @@ boot(Default, boot.fn, 1000)
 # are relatively sound
 
 # 7: GLM and LOOCV
-
-# 7a
-
-# 7b
-
-# 7c
-
-# 7d
-
-# 7e
-
+N = dim(Weekly)[1]
+store = rep("Down",N)
+for(ii in 1:N) {
+test = c(ii)
+glm.fit=glm(Direction~Lag1+Lag2, data=Weekly, family=binomial, subset=-test)
+#summary(glm.fit)
+glm.pred=predict(glm.fit, Weekly[test,], type="response")
+if(glm.pred>0.5) store[ii]="Up"
+}
+store[1:10]
+res = table(Weekly$Direction, store)
+err = (res[1,2] + res[2,1]) / N
+err
 
 # 8: Simulated CV
-
-# 8a
-
+library(boot)
+set.seed(1)
+x = rnorm(100)
+y = x - 2*x^2 + rnorm(100)
+df = data.frame(x=x,y=y)
+# n = 100, p = 2
 # 8b
-
+plot(x,y)
+glm.fit=glm(y~x, data=df)
+cv.err=cv.glm(df,glm.fit)
+cv.err$delta
 # 8c
-
+for(ii in 1:4) {
+glm.fit=glm(y~poly(x,ii), data=df)
+cv.err=cv.glm(df,glm.fit)
+print(cv.err$delta[1])
+}
 # 8d
-
+set.seed(42)
+x = rnorm(100)
+y = x - 2*x^2 + rnorm(100)
+df = data.frame(x=x,y=y)
+for(ii in 1:4) {
+glm.fit=glm(y~poly(x,ii), data=df)
+cv.err=cv.glm(df,glm.fit)
+print(cv.err$delta[1])
+}
 # 8e
-
+# Smallest error was the quadratic model because it reflects the true DGP.
+# If too simple, bias is high, and poor test error
+# If too complex, prone to overfitting, and poor test error
 # 8f
-
+for(ii in 1:4) {
+glm.fit=glm(y~poly(x,ii), data=df)
+print(summary(glm.fit)$dispersion)
+}
 
 # 9: Boston data
-
-# 9a
-
-# 9b
-
+library(MASS)
+dim(Boston)
+summary(Boston)
+N = dim(Boston)[1]
+# 9ab
+summary(lm(medv~1,data=Boston))
 # 9c
-
+boot.fn = function(data, index) {
+return(coef(lm(medv~1, data=Boston, subset=index)))
+}
+res = boot(Boston, boot.fn, 1000)
 # 9d
-
+t.test(Boston$medv)
 # 9e
-
+se = 0.4071597
+t0 = res$t0
+print(t0-2*se)
+print(t0+2*se)
+# bootstrap interval is slightly wider
 # 9f
-
+median(Boston$medv)
 # 9g
-
+boot.fn = function(data, index) {
+return(median(data[index]))
+}
+res = boot(Boston$medv, boot.fn, 1000)
+res
+quantile(res$data, 0.10)
 # 9h
-
-
+boot2.fn = function(data, index) {
+res = boot(data, boot.fn, 1000)
+return(quantile(res$data, 0.10))
+}
+#boot2.fn(Boston$medv, sample(N,N,replace=TRUE))
+boot(Boston$medv, boot2.fn, 1000)
+# very stable, no variation
 
 
 
