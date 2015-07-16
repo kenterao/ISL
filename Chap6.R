@@ -173,3 +173,77 @@ pls.pred=predict(pls.fit,x[test,],ncomp=2)
 mean((pls.pred-y.test)^2)
 pls.fit=plsr(Salary~., data=Hitters,scale=TRUE,ncomp=2)
 summary(pls.fit)
+
+
+
+
+
+# 8 Simulated Data
+library(leaps)
+
+x = rnorm(100)
+eps = rnorm(100)
+b0 = 0
+b1 = 1
+b2 = 2
+b3 = 3
+y = b0 + b1*x + b2*x*x + b3*x*x*x + eps
+df = data.frame(y=y, x=x)
+
+xx = data.frame(model.matrix(y~x+I(x^2)+I(x^3)+I(x^4)+I(x^5)+I(x^6)+I(x^7)+I(x^8)+I(x^9)+I(x^10),df))
+xx$y = df$y
+summary(xx)
+
+regfit.full=regsubsets(y~.+0,data=xx)
+summary(regfit.full)
+regfit.fwd=regsubsets(y~.+0,data=xx,method="forward")
+summary(regfit.fwd)
+regfit.bwd=regsubsets(y~.+0,data=xx,method="backward")
+summary(regfit.bwd)
+
+grid=10^seq(10,-2,length=100)
+lasso.mod=glmnet(as.matrix(xx[,2:11]),y,alpha=1,lambda=grid)
+plot(lasso.mod)
+set.seed(1)
+cv.out=cv.glmnet(as.matrix(xx[,2:11]),y,alpha=1)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+
+lasso.coef=predict(lasso.mod,type="coefficients",s=bestlam)
+lasso.coef
+
+# f
+y = b0 + b1*(x^7) + eps
+df = data.frame(y=y, x=x)
+
+xx = data.frame(model.matrix(y~x+I(x^2)+I(x^3)+I(x^4)+I(x^5)+I(x^6)+I(x^7)+I(x^8)+I(x^9)+I(x^10),df))
+xx$y = df$y
+
+regfit.full=regsubsets(y~.+0,data=xx)
+summary(regfit.full)
+
+cv.out=cv.glmnet(as.matrix(xx[,2:11]),y,alpha=1)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+
+lasso.coef=predict(lasso.mod,type="coefficients",s=bestlam)
+lasso.coef
+
+# 9 College data set
+summary(College)
+# a
+N = dim(College)[1]
+train = sample(c(TRUE,FALSE),N,rep=TRUE)
+test = !train
+# b
+lm.fit = lm(Apps ~ ., data=College, subset=train)
+summary(lm.fit)
+lm.pred = predict(lm.fit, College[test,])
+apps.hat = College[test,c("Apps")]
+length(lm.pred)
+length(apps.hat)
+sum( (lm.pred - apps.hat)^2 ) / length(lm.pred)
+
+
+
+
